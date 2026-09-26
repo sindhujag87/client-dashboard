@@ -8,6 +8,14 @@ async function hash(pw: string) {
 }
 
 async function main() {
+  // Safe to run on every deploy/restart: if data already exists, skip
+  // rather than crashing on duplicate-email errors.
+  const existingUserCount = await prisma.user.count();
+  if (existingUserCount > 0) {
+    console.log("Seed data already present — skipping.");
+    return;
+  }
+
   console.log("Seeding...");
 
   const admin = await prisma.user.create({
